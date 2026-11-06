@@ -75,3 +75,17 @@ if st.button("PREDICT", use_container_width=True):
     elif exp_g < 2.0: pick = "UNDER 2.5 GOALS"
     else: pick = "DOUBLE CHANCE 1X / 12 - No clear edge"
     st.success(f"AI PICK: {pick}")
+    # BTTS - Both Teams To Score
+    home_xg = f[0][1]
+    away_xg = f[0][2]
+    p_home_scores = 1 - np.exp(-home_xg)
+    p_away_scores = 1 - np.exp(-away_xg)
+    btts_yes = p_home_scores * p_away_scores * 100
+    btts_no = 100 - btts_yes
+    st.write(f"BTTS YES: {btts_yes:.1f}% | BTTS NO: {btts_no:.1f}%")
+    if btts_yes > 55:
+        st.success("BTTS PICK: YES")
+    elif btts_no > 55:
+        st.success("BTTS PICK: NO")
+    else:
+        st.info("BTTS PICK: Not clear - skip")
