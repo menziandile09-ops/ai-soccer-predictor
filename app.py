@@ -89,3 +89,5 @@ if st.button("PREDICT", use_container_width=True):
         st.success("BTTS PICK: NO")
     else:
         st.info("BTTS PICK: Not clear - skip")
+from bookings import show_bookings
+from highest_half import show_highest_half
