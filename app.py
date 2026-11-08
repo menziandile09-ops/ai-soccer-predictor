@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-
+from bookings import show_bookings
+from highest_half import show_highest_half
 st.set_page_config(page_title="AI Soccer Predictor", page_icon="⚽")
 st.title("⚽ AI Soccer Prediction - All Leagues")
 
@@ -89,5 +90,5 @@ if st.button("PREDICT", use_container_width=True):
         st.success("BTTS PICK: NO")
     else:
         st.info("BTTS PICK: Not clear - skip")
-from bookings import show_bookings
-from highest_half import show_highest_half
+show_bookings()    
+show_highest_half()
