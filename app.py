@@ -88,3 +88,55 @@ if st.button("PREDICT", use_container_width=True):
         st.success("BTTS PICK: NO")
     else:
         st.info("BTTS PICK: Not clear - skip")
+import streamlit as st
+import math
+
+def show_highest_half(home_xg=1.4, away_xg=1.1):
+    st.divider()
+    st.subheader("⚽ Highest Scoring Half")
+
+    # Total expected goals for the match
+    total_xg = home_xg + away_xg
+
+    # Real football stats: About 44% of goals come in 1st half, 56% in 2nd half
+    # 2nd half has more goals because teams get tired + subs + chasing game
+    xg_1st_half = total_xg * 0.44
+    xg_2nd_half = total_xg * 0.56
+
+    # Poisson: Chance of 0 goals in a half = e ^ -xg
+    # Chance of at least 1 goal = 1 - that
+    prob_0_goals_1st = math.exp(-xg_1st_half)
+    prob_0_goals_2nd = math.exp(-xg_2nd_half)
+
+    # Chance 1st half has MORE goals than 2nd half is roughly:
+    # We use simple model based on xG split
+    # If 2nd half xG is bigger, 2nd half is favourite
+    prob_2nd = 48 + (xg_2nd_half - xg_1st_half) * 15
+    prob_1st = 38 - (xg_2nd_half - xg_1st_half) * 5
+    prob_equal = 100 - prob_2nd - prob_1st
+
+    # Keep numbers safe between 5 and 70
+    prob_2nd = max(30, min(65, prob_2nd))
+    prob_1st = max(20, min(50, prob_1st))
+    prob_equal = 100 - prob_2nd - prob_1st
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("1st Half", f"{prob_1st:.1f}%")
+    c2.metric("2nd Half", f"{prob_2nd:.1f}%")
+    c3.metric("Equal", f"{prob_equal:.1f}%")
+
+    st.write(f"Expected Goals 1st Half: {xg_1st_half:.2f}")
+    st.write(f"Expected Goals 2nd Half: {xg_2nd_half:.2f}")
+
+    # AI PICK
+    if prob_2nd >= 50:
+        st.success("✅ AI PICK: 2nd Half - Highest Scoring Half")
+        st.write("Best Bet: 2nd Half Most Goals")
+    elif prob_1st >= 45:
+        st.success("✅ AI PICK: 1st Half - Highest Scoring Half")
+        st.write("Best Bet: 1st Half Most Goals")
+    else:
+        st.info("⚠️ AI PICK: Not Clear - Skip this market")
+        st.write("Best Bet: SKIP - No strong edge")
+
+    st.caption("Based on: 2nd half usually has more goals than 1st half in real football data.")
